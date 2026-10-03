@@ -1,0 +1,7 @@
+{
+  "url": "https://botmajster.github.io/CryptoMachine-bot",
+  "name": "Crypto Machines",
+  "iconUrl": "https://botmajster.github.io/CryptoMachine-bot/icon.png",
+  "termsOfUseUrl": "https://botmajster.github.io/CryptoMachine-bot",
+  "privacyPolicyUrl": "https://botmajster.github.io/CryptoMachine-bot"
+}
