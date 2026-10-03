@@ -1,0 +1,3042 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Crypto Machines | Telegram Mini App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ===== REACTOR ===== */
+
+        .crystal {       /* ===== REACTOR - INDEX BUTTON ===== */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #066b72;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.25s;
+            position: relative;
+            overflow: hidden;
+            min-height: 110px;
+            width: 100%;
+            height: 90%;
+        }
+        .crystal:hover {        /* ===== REACTOR - INDEX BUTTON podsvietenie===== */
+            transform: scale(1.02);
+            box-shadow: 0 0 22px rgba(13, 216, 199, 0.65);
+        }
+        .reactor-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            z-index: 1;
+            border-radius: 14px;
+        }
+        .reactor-wrapper {      /* ===== REACTOR - INDEX BUTTON pozadie obrazok ===== */
+            display: flex;            
+            flex-direction: column;
+            justify-content: center;            
+            background-image: url('reactorbackground.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            gap: 4px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 2;
+        }
+        .reactor-title {        /* ===== REACTOR - INDEX BUTTON - text HORNY===== */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            color: #10e7ee;
+            letter-spacing: 0.5px;
+            text-align: center;
+            text-shadow: 0 0 2px #5908b6, 0 0 14px #1608da;
+        }
+        .reactor-subtitle {     /* ===== REACTOR - INDEX BUTTON - text STREDNY===== */
+            font-family: 'Orbitron', sans-serif;
+            font-size: 25px;
+            font-weight: 1000;
+            text-align: center;
+            color: #ff5506;
+            letter-spacing: 3px;
+            text-shadow: 0 0 8px #e71001;
+            padding: 5px;
+        }
+        .reactor-level {        /* ===== REACTOR - INDEX BUTTON - text DOLNY===== */
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            text-align: center;
+            color: hsl(123, 91%, 45%);
+            text-shadow: 0 0 10px #1ca0ec, 0 0 18px #29f13a;
+            margin-top: 10px;
+        }
+
+        /* ===== REACTOR MODAL (nový) ===== */
+        .reactor-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 15, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 1400;
+        }
+
+        .reactor-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 750px;
+            background-image: url('okna.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 14px;
+            border: 3px solid #066b72;
+            box-shadow: 0 0 40px rgba(0, 170, 255, 0.45);
+            z-index: 1401;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reactor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 12px;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border-bottom: 2px solid rgba(56, 187, 187, 0.35);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            color: #fcc11f;
+            letter-spacing: 1.5px;
+        }
+
+        .reactor-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            padding: 12px 10px 8px;
+        }
+
+        .reactor-tab {
+            padding: 10px 4px;
+            border-radius: 10px;
+            border: 2px solid #066b72;
+            background: rgba(0, 25, 45, 0.85);
+            color: #7ab8c9;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .reactor-tab:hover {
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        .reactor-tab.active {
+            border-color: #00ff88;
+            background: rgba(0, 50, 40, 0.9);
+            color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.35);
+        }
+
+        .reactor-content {
+            flex: 1;
+            padding: 12px 14px 20px;
+            overflow-y: auto;
+        }
+
+        .reactor-placeholder {
+            text-align: center;
+            color: #7ab8c9;
+            font-size: 14px;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        .close-btn {        /* ===== REACTOR okno tlacitko X ===== */
+            background: rgb(92, 132, 241);
+            border-radius: 14px;
+            border: 3px solid #0975b4;
+            box-shadow: 0 0 8px rgba(3, 36, 143, 0.6);
+            color: #1c56c2;
+            font-size: 24px;
+            font-weight: 900;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        .big-reactor {
+            width: 90px;
+            height: 110px;
+            background: url('okna.png');
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 128px;
+            font-weight: 800;
+            color: #0ce5f5;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.7);
+            text-shadow: 0 0 12px #c084fc;
+            border: 10px solid hsl(350, 83%, 45%);
+        }
+
+        /* ===== DAILY BONUS MODAL ===== */
+        .daily-overlay {        /* ===== DAILY BONUS OKNO - Samostatne okno v tme ===== */
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 15, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+        }
+
+        .daily-window {     /* ===== DAILY BONUS OKNO - Hlavne nastavenia ===== */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 700px;
+            background-image: url('okna.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 14px;
+            border: 3px solid #066b72;
+            box-shadow: 0 0 40px rgba(0, 170, 255, 0.45);
+            z-index: 1201;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .daily-header {     /* ===== DAILY BONUS Hlavicka ===== */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border: 3px solid rgba(56, 187, 187, 0.4);
+            border-radius: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 1000;
+            color: #fcc11f;
+            letter-spacing: 2px;
+        }
+
+        .daily-body {
+            flex: 1;
+            padding: 6px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            overflow-y: auto;
+        }
+
+        .daily-btn {        /*  ===== DAILY BONUS OKNO - Tlacitka velkost a pozadia ===== */
+            width: 100%;
+            max-width: 270px;
+            height: 100px;                    /* pevná výška tlačidla */
+            border-radius: 14px;
+            border: 2px solid #215cc9;
+            box-shadow: 0 0 40px rgba(75, 132, 236, 0.5);
+            cursor: pointer;
+            transition: 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            gap: 8px;
+        }
+        .daily-btn img {
+            width: 100%;
+            height: 100%;
+            background-color: none;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .daily-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 58px rgba(45, 231, 245, 0.8);
+            border-color: #07768a;
+        }
+        .daily-btn:active {
+            transform: scale(0.97);
+        }
+            /* ===== DAILY BONUS - okno otvorene hore nazov farba a text ===== */
+        .daily-header {     /* ===== DAILY BONUS -Okno s 3 tlacitkami ===== */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 8px;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border: 3px solid rgba(56, 187, 187, 0.4);
+            border-radius: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 1000;
+            color: #fcc11f;
+            letter-spacing: 2px;
+        }
+
+        .daily-body {
+            flex: 1;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 70px;
+            background: transparent;   /* bez zatemnenia – ostane len obrázok */
+            text-align: center;
+        }
+
+        .daily-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #042e31;
+            text-shadow: 0 0 10px #4d9fa7;
+            margin-bottom: 12px;
+        }
+
+        .daily-text {
+            font-size: 23px;
+            color: #eb890a;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            max-width: 280px;
+        }
+
+        .daily-claim-btn {
+            border: none;
+            border-radius: 30px;
+            padding: 12px 28px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgb(243, 125, 16);
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.6);
+            transition: 0.2s;
+        }
+
+        .daily-claim-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(173, 201, 19, 0.8);
+        }
+
+        .daily-claim-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== DAILY LOGIN 15 DNÍ ===== */
+        .login-overlay {        /* ===== DAILY LOGIN OKNO - styl samotne  ===== */
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 15, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 1300;
+        }
+
+        .login-window {     /* ===== DAILY LOGIN OKNO - hlavne okno tam kde su dni  ===== */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            max-width: 500px;
+            max-height: 700px;
+            background-image: url('okna.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 14px;
+            border: 3px solid #1d57c2;
+            box-shadow: 0 0 40px rgba(0, 170, 255, 0.45);
+            z-index: 1300;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-header {     /* ===== DAILY LOGIN OKNO - HLAVICKA  ===== */
+            display: flex;
+            padding: 11px 8px;
+            justify-content: space-between;
+            align-items: center;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border: 3px solid rgba(56, 187, 187, 0.4);
+            border-radius: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 1000;
+            color: #fcc11f;
+            letter-spacing: 2px;
+        }
+
+        .login-body {       /* ===== DAILY LOGIN OKNO - Hlavne okno kde su dni  ===== */
+            flex: 1;
+            padding: 200px 10px 200px;
+            overflow-y: noscroll;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .login-info {
+            text-align: center;
+            font-size: 11px;
+            color: #a8d4ff;
+            line-height: 1.4;
+        }
+
+        .login-streak {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            color: #ffe602;
+            text-shadow: 0 0 8px #bd711c;
+        }
+
+        .login-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .login-day {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 2px solid #1a5a62;
+            background: rgba(0, 20, 35, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            transition: 0.2s;
+            padding: 3px;
+            position: relative;
+            opacity: 0.55; /* tmavšie = neaktívne / budúce */
+        }
+
+        .login-day .day-num {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: #4a9aaa;
+        }
+
+        .login-day .day-reward {
+            font-size: 9px;
+            color: #5a8a4a;
+            text-align: center;
+            margin-top: 2px;
+            line-height: 1.15;
+        }
+
+        /* dnešný dostupný deň */
+        .login-day.available {
+            opacity: 1;
+            border-color: #00ff88;
+            background: rgba(0, 40, 45, 0.9);
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+            animation: loginPulse 1.6s ease-in-out infinite;
+        }
+
+        .login-day.available .day-num { color: #00f0ff; }
+        .login-day.available .day-reward { color: #7af805; }
+
+        .login-day.available:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 18px rgba(0, 255, 200, 0.6);
+        }
+
+        /* už vyzdvihnuté */
+        .login-day.claimed {
+            opacity: 1;
+            border-color: #00cc77;
+            background: rgba(0, 45, 30, 0.75);
+            cursor: default;
+        }
+
+        .login-day.claimed .day-num { color: #00ffaa; }
+        .login-day.claimed .day-reward { color: #88cc88; }
+
+        .login-day.claimed::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            color: #00ff88;
+            font-size: 13px;
+            font-weight: 900;
+            text-shadow: 0 0 6px #00ff88;
+        }
+
+        @keyframes loginPulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+            50% { box-shadow: 0 0 16px rgba(0, 255, 136, 0.75); }
+        }
+
+            /* ===== HLAVNA STRANKA POZADIE ===== */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* dôležité – žiadny scroll */
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: hsl(27, 100%, 54%);
+            font-family: 'Rajdhani', sans-serif;
+            user-select: none;
+        }
+
+        /* ===== HLAVNÝ KONTAJNER – pevná „dizajnová“ veľkosť ===== */
+        .container {
+            width: 460px;          /* šírka podľa tvojho dizajnu */
+            height: 860px;         /* výška podľa tvojho dizajnu (iPhone-like) */
+            max-width: none;
+            margin: 0;
+            padding: 15px;
+            position: relative;
+            transform-origin: center center;
+            /* scale nastaví JavaScript */
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 70px;
+        }
+
+        .profile-badge {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #7b2ff7, #00d4ff);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(123, 47, 247, 0.6);
+            cursor: pointer;
+            transition: 0.2s;
+            border: #0072ff;
+        }
+
+        .profile-badge:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 30px rgba(123, 47, 247, 0.9);
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0a1525;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+            /* ===== PROFILOVY OANACIK FARBA ===== */
+        .profile-avatar svg {
+            width: 26px;
+            height: 26px;
+            fill: #10e61b;
+        }
+
+        .rep-under-profile {
+            text-align: center;
+            font-size: 12px;
+            color: #e47f0b;
+            font-weight: 900;
+        }
+
+        .stats-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding-top: 2px;
+        }
+        .stat-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .stat-label {
+            font-size: 50px;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-label.battery {
+            color: #2ff315;
+            font-size: 13px;
+            font-weight: 770;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .stat-label.rep {
+            color: #dd7b0b;
+            font-size: 13px;
+            font-weight: 1000;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+        .stat-label.power {
+            color: #15d3ec;
+            font-size: 13px;
+            font-weight: 800;
+            font-family: monospace;
+            letter-spacing: 0.1px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 10px;
+            background: rgba(207, 132, 62, 0.12);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+
+        .battery-fill {
+            background: linear-gradient(90deg, #00f0ff, #0088ff);
+            box-shadow: 0 0 8px rgba(114, 223, 217, 0.6);
+        }
+
+        .rep-fill {
+            background: linear-gradient(90deg, #ffaa00, #ff6600);
+            box-shadow: 0 0 8px rgba(255, 150, 0, 0.6);
+        }
+
+        .stat-value {
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 48px;
+            text-align: right;
+        }
+
+        .top-right {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+            margin-left: 8px;
+        }
+
+        .network-badge,.miners-badge {
+            background: rgba(0, 40, 80, 0.6);
+            border: 1px solid #00aaff;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .network-badge { border-color: #00ffcc; }
+        .miners-badge { border-color: #ffaa00; color: #ffcc00; }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ff88;
+        }
+
+        /* ===== HASHRATE + TAPS ===== */
+        .hash-rewards {     /* ===== HLAVICKA STATY - pozadie a ine ===== */
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            background-image: url('statsbackground.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border: 3px solid #066b72;
+            border-radius: 25px;
+            padding: 8px 8px;
+            box-shadow: 0 0 25px rgba(0, 150, 255, 0.3);
+        }
+
+        .hash-item {
+            text-align: center;
+            flex: 1;
+        }
+            /* ===== HLAVICKA STATY ATD TEXT A NAZOV STATOV ===== */
+        .hash-item .label {
+            font-size: 18px;
+            font-weight: 1000;
+            color: #cc7605;
+            text-shadow: 0 0 8px #e6510c;
+            letter-spacing: 0.7px;
+            margin-bottom: 2px;
+        }
+
+        .hash-item .value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: #02fdf1;
+            text-shadow: 0 0 10px #0c51e7;
+            transition: color 0.3s;
+        }
+        .taps-value {
+            color: #02fdf1 !important;
+            text-shadow: 0 0 10px #0c51e7;
+        }
+        .balance-value {
+            color: #02fdf1 !important;
+            text-shadow: 0 0 10px #0c51e7;
+        }
+        .hashrate-low {
+            color: #ff5555 !important;
+            text-shadow: 0 0 10px #ff5555;
+        }
+
+        /* ===== KONTAJNERY SPACE ===== */
+        .rigs-container {
+            position: relative;
+            height: 158px;
+            margin: 8px 0 0;
+            margin-bottom: 10px;
+        }
+        .rig {      /* ===== KONTAJNERY SPACE - Hlavna stranka Box vyzor ===== */
+            position: absolute;
+            width: 85px;
+            height: 140px;
+            background-image: url('boximage.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            border: 3px solid #066b72;
+            border-radius: 14px;
+            box-shadow: 0 0 18px rgba(10, 255, 235, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 1px;
+            transition: 0.3s;
+        }
+        .rig:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 28px rgba(0, 200, 255, 0.7);
+        }
+            
+        .rig-01 {
+            left: 3%; top: 100px;
+        }
+        .rig-02 {
+            left: 27%; top: 0;
+        }
+        .rig-03 {
+            right: 27%; top: 0;
+        }
+        .rig-04 {
+            right: 3%; top: 100px;
+        }
+        .rig-name {     /* ===== KONTAJNERY SPACE - INDEX miner sloty/kruhy NAZOV + FARBA ===== */
+            font-size: 13px;
+            font-weight: 1000;
+            color: #00f0ff;
+            letter-spacing: 2px;
+            margin-bottom: 3px;
+        }
+        .rig-fans {    /* ===== KONTAJNERY SPACE - INDEX miner sloty/kruhy rozmiestnenie ===== */ 
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding-top: 6px;
+        }
+
+        .fan {      /* ===== KONTAJNERY SPACE - Hlavna stranka Box FREE SLOT ===== */
+            width: 28px;
+            height: 28px;
+            border: 2px solid #00aaff;
+            border-radius: 50%;
+            background: radial-gradient(circle, #003366, #001122);
+            animation: spin 3s linear infinite;
+            position: relative;
+        }
+        .fan.active {       /* ===== KONTAJNERY SPACE - Hlavna stranka Box AKTIVOVANY MINER ===== */
+            border-color: #07d818 !important;
+            background: radial-gradient(circle, #2d7224, #2d7224);
+            box-shadow: 0 0 12px #2d7224, 0 0 20px #2d7224;
+            animation: spin 2.5s linear infinite;
+        }
+        .fan.active::before {
+            border-color: #07d818 !important;
+        }
+        .fan::before {      /* ===== KONTAJNERY SPACE - Hlavna stranka Box FREE SLOT ===== */
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border: 2px solid #00f0ff;
+            border-radius: 50%;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== BOX MODAL ===== */
+        .box-overlay {      /* ===== BOX SPACE 00 - Samotne oknos tmavym pozadim===== */
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 15, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+        }
+        .box-window {       /* ===== BOX SPACE 00 - Okno===== */
+            position: fixed;
+            top:52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            max-width: 500px;
+            height: 90%;
+            max-height: 750px;
+            background-image: url('okna.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border-radius: 14px;
+            border: 3px solid #066b72;
+            box-shadow: 0 0 40px rgba(0, 170, 255, 0.4);
+            z-index: 1001;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }        
+        .box-header {       /* ===== BOX SPACE 00 - OKNO Hlavicka===== */
+            display: flex;
+            padding: 11px 8px;
+            justify-content: space-between;
+            align-items: center;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border: 3px solid rgba(56, 187, 187, 0.4);
+            border-radius: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 1000;
+            color: #fcc11f;
+            letter-spacing: 2px;
+        }
+        .box-body {
+            position: fixed;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            max-width: 500px;
+            height: 95%;
+            max-height: 750px;
+            display: flex;
+            background-size: 100%;
+            padding-top: 20px;
+        }
+        .slots-title {      /* ===== BOX OKNO - Text pod Hlavickou ===== */
+            display: flex;
+            position: absolute;
+            text-align: center;
+            font-size: 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 500;
+            color: #06eff7;
+            letter-spacing: 0.6px;
+            padding-top: 20px;
+        }
+
+        .slots-container {      /* ===== BOX OKNO - SLOTY-Pozicia farba atd ===== */
+            display: flex;
+            position: absolute;
+            justify-content: space-between;
+            gap: 80px;
+            padding-top: 150px;
+            padding-left: 50px;
+        }
+
+        .miner-slot {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid #e0b75d;
+            background: radial-gradient(circle, #2c2102, #000d1a);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            cursor: pointer;
+            transition: 0.25s;
+            position: center;
+            box-shadow: 0 0 12px rgba(158, 199, 228, 0.3);
+        }
+
+        .miner-slot:hover {
+            transform: scale(1.08);
+            border-color: #f78605;
+            box-shadow: 0 0 20px rgba(237, 253, 11, 0.5);
+        }
+
+        .miner-slot.occupied {
+            border-color: #00ff88;
+            background: radial-gradient(circle, #002211, #001108);
+            box-shadow: 0 0 18px rgba(0, 255, 136, 0.5);
+        }
+        .miner-slot .slot-icon {        /* ===== STOJAN Okno na vlozenie minera to je to " + " ===== */
+            font-size: 65px;
+            font-weight: 1100;
+            color: #c4933a;
+        }
+        .miner-slot .slot-label {       /* ===== STOJAN okno pod kruhom na vlozenie TEXT teda PRAZDNE ===== */
+            position: absolute;
+            font-size: 21px;
+            color: #d6f1f3;
+            white-space: nowrap;
+            font-weight: 1000;
+            padding-top: 120px;
+        }
+        .box-info {
+            text-align: center;
+            font-size: 12px;
+            color: #bb6666;
+            position: absolute;
+            bottom: 100px;
+        }
+
+        /* ===== TAP CIRCLE ===== */
+        .tap-area {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin: -25px 0 18px;
+            z-index: 20;
+        }
+
+        .tap-circle {
+            width: 135px;
+            height: 135px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #00e5ff, #0066aa 60%, #003355);
+            border: 3px solid #00f0ff;
+            box-shadow: 
+                0 0 30px rgba(0, 240, 255, 0.7),
+                0 0 60px rgba(0, 150, 255, 0.4),
+                inset 0 0 25px rgba(0, 200, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.12s, box-shadow 0.12s;
+        }
+
+        .tap-circle:active {
+            transform: scale(0.90);
+            box-shadow: 0 0 45px rgba(0, 240, 255, 1), 0 0 80px rgba(0, 150, 255, 0.6);
+        }
+
+        .tap-circle.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(0.7);
+        }
+
+        .tap-circle svg {
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.9));
+            pointer-events: none;
+        }
+
+        .floating-number {
+            position: absolute;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: #f8e006;
+            text-shadow: 0 0 12px #e25e12, 0 0 20px #e9b21b;
+            pointer-events: none;
+            animation: floatUp 1.4s ease-out forwards;
+            z-index: 50;
+            white-space: nowrap;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-110px) scale(1.4); }
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 1px;
+        }
+            /* ===== tlacidla 4 pod tapom ===== */
+        .action-btn {
+            display: flex;
+            cursor: pointer;
+            transition: 0.25s;
+            padding: 30px 5px;
+            border: 3px solid #042d30;
+            border-radius: 14px;
+        }
+        .action-btn:hover {
+            transform: scale(1.02);
+            filter: brightness(1.15);
+            box-shadow: 0 0 20px rgba(41, 217, 230, 0.5);
+        }
+        .btn-research {
+            display: flex;
+            background-image: url('TECHCENTER.png'); 
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .btn-bonus {
+            display: flex;
+            background-image: url('dailybonus.png');
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .btn-mission {
+            display: flex;
+            background-image: url('quest.png');
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .btn-mining {
+            display: flex;
+            background-image: url('miner.png');
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .action-btn .title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
+        }
+
+        .action-btn .desc {
+            font-size: 12px;
+            opacity: 0.85;
+            line-height: 1.35;
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== BOTTOM SECTION ===== */
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 1.3fr 0.85fr 0.95fr;
+            gap: 4px;
+            align-items: stretch;
+            margin-top: 10px;
+        }
+        .live-stats {       /* ===== LIVE STATS INDEX - Pozadie + ram a ine ===== */
+            display: flex;
+            flex-direction: column;
+            background-image: url('Livestats.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 3px solid #066b72;
+            border-radius: 14px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 90%;
+        }
+        .live-stats::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 10, 30, 0.65);
+            z-index: 0;
+        }
+        .live-stats h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #00f0ff;
+            text-align: center;
+            margin-bottom: 25px;
+            letter-spacing: 1.1px;
+            text-shadow: 0 0 8px #00f0ff, 0 0 16px #00aaff, 0 0 24px rgba(106, 242, 252, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-grid {       /* ===== LIVE STATS INDEX - Rozmiestnenie textu a riadkov ===== */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 11px;
+            position: relative;
+            z-index: 1;
+        }
+        .stat-box .label {
+            color: #0ad6cc;
+            font-size: 10px;
+            letter-spacing: 0.3px;
+            opacity: 0.9;
+        }
+        .stat-box .val {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            color: #46f3ff;
+            text-shadow: 0 0 6px #0befff, 0 0 12px rgba(69, 233, 245, 0.4);
+        }
+
+        .side-menu {        /* ===== SHOP + STORAGE + LEADERBOARD - IKONY Stlpec 3 pod sebou nastavenia ===== */
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 80%;
+            justify-content: center;
+            padding-top: 25px;
+        }
+
+        .menu-btn {
+            background: rgba(0, 20, 50, 0.6);
+            border: 3px solid #066b72;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
+            min-height: 70px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            border-color: #066b72;
+            transform: scale(1.03);
+            filter: brightness(1.15);
+        }
+
+        .menu-btn .label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 2;
+            opacity: 1;
+            text-shadow: 0 0 6px currentColor, 0 0 12px currentColor, 0 0 18px currentColor, 0 0 25px rgba(0, 240, 255, 0.5);
+            margin-bottom: 4px;
+        }
+
+        .menu-btn .sub-label {
+            letter-spacing: 0.6px;
+            opacity: 0.85;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 16px;
+            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+        }
+        .menu-btn.marketplace {
+            background-image: url('Shop.png');
+            border-color: #066b72;
+            border-radius: 8px;
+        }
+        .menu-btn.inventory {
+            background-image: url('inventory.png');
+            border-color: #066b72;
+            border-radius: 8px;
+        }
+        .menu-btn.leaderboard {
+            background-image: url('Leaderboard.png');
+            border-color: #066b72;
+            border-radius: 8px;
+        }
+        /* ===== PROFILE MODAL ===== */
+        .profile-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 15, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 1200;
+        }
+
+        .profile-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 700px;
+            background-image: url('okna.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 14px;
+            border: 3px solid #066b72;
+            box-shadow: 0 0 40px rgba(0, 170, 255, 0.45);
+            z-index: 1201;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 100px;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 8px;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border: 3px solid rgba(56, 187, 187, 0.4);
+            border-radius: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 1000;
+            color: #fcc11f;
+            letter-spacing: 3px;
+        }
+
+        .profile-body {
+            padding: 18px 16px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+        }
+
+        .profile-btn {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #066b72;
+            background: rgba(0, 25, 45, 0.85);
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.22s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-btn:hover {
+            transform: scale(1.02);
+            border-color: #00ffcc;
+            box-shadow: 0 0 18px rgba(0, 255, 200, 0.35);
+            background: rgba(0, 40, 60, 0.95);
+        }
+
+        .profile-btn .icon {
+            font-size: 20px;
+            width: 28px;
+            text-align: center;
+        }
+
+        /* Empty sub-windows (Change Avatar / Profile / Settings) */
+        .empty-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 700px;
+            background-image: url('okna.png');
+            background-size: cover;
+            border-radius: 14px;
+            border: 3px solid #066b72;
+            box-shadow: 0 0 35px rgba(0, 170, 255, 0.4);
+            z-index: 1301;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .empty-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 12px;
+            background-image: url('header.png');
+            background-size: 100%;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 1000;
+            color: #fcc11f;
+        }
+
+        .empty-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7ab8c9;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+        /* ===== SHOP MODAL ===== */
+        .shop-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 15, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 1400;
+        }
+
+        .shop-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 750px;
+            background-image: url('okna.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 14px;
+            border: 3px solid #066b72;
+            box-shadow: 0 0 40px rgba(0, 170, 255, 0.45);
+            z-index: 1401;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 12px;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border-bottom: 2px solid rgba(56, 187, 187, 0.35);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: #fcc11f;
+            letter-spacing: 2px;
+        }
+
+        .shop-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            padding: 12px 10px 8px;
+        }
+
+        .shop-tab {
+            padding: 10px 4px;
+            border-radius: 10px;
+            border: 2px solid #066b72;
+            background: rgba(0, 25, 45, 0.85);
+            color: #7ab8c9;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .shop-tab:hover {
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        .shop-tab.active {
+            border-color: #00ff88;
+            background: rgba(0, 50, 40, 0.9);
+            color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.35);
+        }
+
+        .shop-content {
+            flex: 1;
+            padding: 12px 14px 20px;
+            overflow-y: auto;
+        }
+
+        .shop-placeholder {
+            text-align: center;
+            color: #7ab8c9;
+            font-size: 14px;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        /* ===== STORAGE MODAL ===== */
+        .storage-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 15, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 1400;
+        }
+
+        .storage-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 750px;
+            background-image: url('okna.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 14px;
+            border: 3px solid #066b72;
+            box-shadow: 0 0 40px rgba(0, 170, 255, 0.45);
+            z-index: 1401;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 12px;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border-bottom: 2px solid rgba(56, 187, 187, 0.35);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: #fcc11f;
+            letter-spacing: 2px;
+        }
+
+        .storage-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            padding: 12px 10px 8px;
+        }
+
+        .storage-tab {
+            padding: 10px 4px;
+            border-radius: 10px;
+            border: 2px solid #066b72;
+            background: rgba(0, 25, 45, 0.85);
+            color: #7ab8c9;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .storage-tab:hover {
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        .storage-tab.active {
+            border-color: #00ff88;
+            background: rgba(0, 50, 40, 0.9);
+            color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.35);
+        }
+
+        .storage-content {
+            flex: 1;
+            padding: 12px 14px 20px;
+            overflow-y: auto;
+        }
+
+        .storage-placeholder {
+            text-align: center;
+            color: #7ab8c9;
+            font-size: 14px;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        /* ===== LEADERBOARD MODAL ===== */
+        .leaderboard-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 15, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 1400;
+        }
+
+        .leaderboard-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 750px;
+            background-image: url('okna.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 14px;
+            border: 3px solid #066b72;
+            box-shadow: 0 0 40px rgba(0, 170, 255, 0.45);
+            z-index: 1401;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 12px;
+            background-image: url('header.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            border-bottom: 2px solid rgba(56, 187, 187, 0.35);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            color: #fcc11f;
+            letter-spacing: 1.5px;
+        }
+
+        .leaderboard-tabs {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            padding: 12px 8px 8px;
+        }
+
+        .leaderboard-tab {
+            padding: 9px 2px;
+            border-radius: 10px;
+            border: 2px solid #066b72;
+            background: rgba(0, 25, 45, 0.85);
+            color: #7ab8c9;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .leaderboard-tab:hover {
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        .leaderboard-tab.active {
+            border-color: #00ff88;
+            background: rgba(0, 50, 40, 0.9);
+            color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.35);
+        }
+
+        .leaderboard-content {
+            flex: 1;
+            padding: 12px 14px 20px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-placeholder {
+            text-align: center;
+            color: #7ab8c9;
+            font-size: 14px;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container" id="container" title="container">
+        <!-- TOP BAR -->
+        <div class="top-bar" title="top-bar">
+            <div class="profile-section" title="profile-section">
+                <div class="profile-badge" onclick="openProfile()" title="profile-badge">
+                    <div class="profile-avatar" title="profile-avatar">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rep-under-profile" id="repLevelText" title="rep-under-profile">Lv. 1</div>
+            </div>
+
+            <div class="stats-section" title="stats-section">
+                <div class="stat-row" title="stat-row">
+                    <span class="stat-label battery">🔋 Battery</span>
+                    <div class="progress-bar" title="progress-bar">
+                        <div class="progress-fill battery-fill" id="batteryFill" style="width: 0%" title="progress-fill battery-fill">
+                        </div>
+                    </div>
+                    <span class="stat-value" id="batteryValue" style="color: #4af516; text-align: right; flex: 1;">100/100</span>
+                </div>
+
+                <div class="stat-row" title="stat-row">
+                    <span class="stat-label rep">💡 Experience</span>
+                    <div class="progress-bar" title="progress-bar">
+                        <div class="progress-fill rep-fill" id="repFill" style="width: 0%" title="progress-fill rep-fill">
+                        </div>
+                    </div>                    
+                    <span class="stat-value" id="repValue" style="color: #f8bf04; text-align: right; flex: 1;" title="stat-value">0%</span>
+                </div>
+                <div class="stat-row" title="stat-row">
+                    <span class="stat-label power"> $ CRM Mining</span>
+                    <span class="stat-value" id="crmMiningValue" style="color: #19ecf3; text-align: right; flex: 1;" title="stat-value">0.00000000 CRM/h</span>
+                </div>
+            </div>
+
+            <div class="top-right" title="top-right">
+                <div class="network-badge" title="network-badge">
+                    <span>Miners</span>
+                    <span class="dot"></span>
+                    <strong>ONLINE</strong>
+                </div>
+                <div class="miners-badge"title="miners-badge">⛏ Active Miners
+                    <strong id="topActiveMiners">0 / 12</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hashrate + Taps + Balance -->
+        <div class="hash-rewards" title="hash-rewards">
+            <div class="hash-item" title="hash-item">
+                <div class="label" title="label">MINERS POWER</div>
+                <div class="value" id="hashrateValue" title="value">1.0 GH/s</div>
+            </div>
+            <div class="hash-item" title="hash-item">
+                <div class="label" title="label">FREE TAPS</div>
+                <div class="value taps-value" id="tapsValue" title="value taps-value">100/100</div>
+            </div>
+            <div class="hash-item" title="hash-item">
+                <div class="label" title="label">BALANCE: CRM</div>
+                <div class="value balance-value" id="balanceValue" title="value balance-value">0,00000000</div>
+            </div>
+        </div>
+
+        <!-- BOXY -->
+        <div class="rigs-container" title="rigs-container">
+            <div class="rig rig-01" onclick="openBox(1)" title="rig-01">
+                <div class="rig-name" title="rig-name">SPACE-01</div>
+                <div class="rig-fans" title="rig-fans">
+                    <div class="fan" id="box1-slot1" title="fan"></div>
+                    <div class="fan" id="box1-slot2" title="fan"></div>
+                    <div class="fan" id="box1-slot3" title="fan"></div>
+                </div>
+            </div>
+            <div class="rig rig-02" onclick="openBox(2)" title="rig-02">
+                <div class="rig-name" title="rig-name">SPACE-02</div>
+                <div class="rig-fans" title="rig-fans">
+                    <div class="fan" id="box2-slot1" title="fan"></div>
+                    <div class="fan" id="box2-slot2" title="fan"></div>
+                    <div class="fan" id="box2-slot3" title="fan"></div>
+                </div>
+            </div>
+            <div class="rig rig-03" onclick="openBox(3)" title="rig-03">
+                <div class="rig-name" title="rig-name">SPACE-03</div>
+                <div class="rig-fans" title="rig-fans">
+                    <div class="fan" id="box3-slot1" title="fan"></div>
+                    <div class="fan" id="box3-slot2" title="fan"></div>
+                    <div class="fan" id="box3-slot3" title="fan"></div>
+                </div>
+            </div>
+            <div class="rig rig-04" onclick="openBox(4)" title="rig-04">
+                <div class="rig-name" title="rig-name">SPACE-04</div>
+                <div class="rig-fans" title="rig-fans">
+                    <div class="fan" id="box4-slot1" title="fan"></div>
+                    <div class="fan" id="box4-slot2" title="fan"></div>
+                    <div class="fan" id="box4-slot3" title="fan"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAP -->
+        <div class="tap-area" title="tap-area">
+            <div class="tap-circle" id="tapCircle" title="tap-circle">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="42" stroke="#00f0ff" stroke-width="1.5" stroke-opacity="0.45"/>
+                    <circle cx="50" cy="50" r="36" stroke="#00d4ff" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="4 6"/>
+                    <path d="M50 22 L68 33 L68 55 L50 66 L32 55 L32 33 Z" fill="url(#crystalGradient)" stroke="#00f0ff" stroke-width="2.2"/>
+                    <path d="M50 30 L62 37 L62 51 L50 58 L38 51 L38 37 Z" fill="#e0f7ff" fill-opacity="0.75"/>
+                    <circle cx="50" cy="44" r="8" fill="#ffffff" fill-opacity="0.9"/>
+                    <circle cx="50" cy="44" r="4.5" fill="#00f0ff"/>
+                    <path d="M50 22 L50 10" stroke="#00f0ff" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+                    <path d="M68 33 L80 25" stroke="#00f0ff" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
+                    <path d="M68 55 L80 63" stroke="#00f0ff" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
+                    <path d="M32 33 L20 25" stroke="#00f0ff" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
+                    <path d="M32 55 L20 63" stroke="#00f0ff" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
+                    <circle cx="24" cy="42" r="1.6" fill="#00f0ff" opacity="0.85"/>
+                    <circle cx="76" cy="50" r="1.3" fill="#00f0ff" opacity="0.75"/>
+                    <circle cx="58" cy="78" r="1.5" fill="#00f0ff" opacity="0.7"/>
+                    <circle cx="38" cy="18" r="1.2" fill="#00f0ff" opacity="0.8"/>
+                    <defs>
+                        <linearGradient id="crystalGradient" x1="50" y1="22" x2="50" y2="66">
+                            <stop offset="0%" stop-color="#00f0ff"/>
+                            <stop offset="45%" stop-color="#0099ff"/>
+                            <stop offset="100%" stop-color="#0055bb"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="actions" title="actions">
+            <div class="action-btn btn-mining" onclick="openMinersCenter()" title="action-btn btn-mining">
+            </div>
+            <div class="action-btn btn-research" onclick="openResearch()" title="action-btn btn-research">
+            </div>
+            <div class="action-btn btn-bonus" onclick="openDailyBonus()" title="action-btn btn-bonus">
+            </div>
+            <div class="action-btn btn-mission" onclick="openQuest()" title="action-btn btn-mission">
+            </div>
+        </div>
+
+        <!-- BOTTOM SECTION -->
+        <div class="bottom-section" title="bottom-section">
+            <!-- LIVE STATS -->
+            <div class="live-stats" title="live-stats">
+                <h3># Live statistic</h3>
+                <div class="stats-grid" title="stats-grid">
+                    <div class="stat-box" title="stat-box">
+                        <div class="label" title="label">TOTAL POWER</div>
+                        <div class="val" id="totalPower" title="val">1.0 GH/s</div>
+                    </div>
+                    <div class="stat-box" title="stat-box">
+                        <div class="label" title="label">MINERS OWNED</div>
+                        <div class="val" id="minersOwned" title="val">5</div>
+                    </div>
+                    <div class="stat-box" title="stat-box">
+                        <div class="label" title="label">TOTAL TAPS</div>
+                        <div class="val" id="totalTaps" title="val">0</div>
+                    </div>
+                    <div class="stat-box" title="stat-box">
+                        <div class="label" title="label">REACTOR</div>
+                        <div class="val" id="reactorPower" title="val">1.0 GH/s</div>
+                    </div>
+                    <div class="stat-box" title="stat-box">
+                        <div class="label" title="label">PLAYED TIME</div>
+                        <div class="val" id="playedTime" title="val">00:00:00</div>
+                    </div>
+                    <div class="stat-box" title="stat-box">
+                        <div class="label" title="label">ACTIVE MINERS</div>
+                        <div class="val" id="activeMiners" title="val">0 / 12</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REACTOR -->
+            <div class="crystal" onclick="openReactor()" title="crystal">
+                <div class="reactor-wrapper" title="reactor-wrapper">
+                    <div class="reactor-title" title="reactor-title">REACTOR</div>
+                    <div class="reactor-bottom" title="reactor-bottom">
+                        <div class="reactor-subtitle" title="reactor-subtitle">ROOM</div>
+                        <div class="reactor-level" id="reactorLevel" title="reactor-level">Level 1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDE MENU -->
+            <div class="side-menu" title="side-menu">
+                <div class="menu-btn marketplace" onclick="openShop()" title="menu-btn marketplace">
+                </div>
+                <div class="menu-btn inventory" onclick="openStorage()" title="menu-btn inventory">
+                </div>
+                <div class="menu-btn leaderboard" onclick="openLeaderboard()" title="menu-btn leaderboard">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== TON CONNECT =====
+        let tonConnectUI = null;
+        let walletAddress = null;
+
+        function initTonConnect() {
+            if (tonConnectUI) return;
+
+            tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: 'https://botmajster.github.io/CryptoMachine-bot/tonconnect-manifest.json', // dočasný – neskôr daj svoj
+                buttonRootId: null,          // nechceme automatické tlačidlo
+                uiPreferences: {
+                    theme: 'DARK',
+                    borderRadius: 'm'
+                },
+                actionsConfiguration: {
+                    twaReturnUrl: 'https://t.me/CryptoMachineGame_bot/'  // ← ZMEŇ NA SVOJ BOT!
+                }
+            });
+
+            // Sledovanie stavu pripojenia
+            tonConnectUI.onStatusChange(wallet => {
+                if (wallet) {
+                    walletAddress = wallet.account.address;
+                    console.log('Wallet connected:', walletAddress);
+                    showToast('Wallet pripojená!');
+                    updateWalletUI();
+                } else {
+                    walletAddress = null;
+                    updateWalletUI();
+                }
+            });
+        }
+
+        // Spusti pri načítaní stránky
+        document.addEventListener('DOMContentLoaded', () => {
+            initTonConnect();
+        });
+        // Ak už máš DOMContentLoaded inde, daj len: initTonConnect();
+        // ===== ELEMENTY =====
+        const tapCircle = document.getElementById('tapCircle');
+        const tapsValueEl = document.getElementById('tapsValue');
+        const batteryFill = document.getElementById('batteryFill');
+        const batteryValue = document.getElementById('batteryValue');
+        const hashrateValue = document.getElementById('hashrateValue');
+        const repFill = document.getElementById('repFill');
+        const repValue = document.getElementById('repValue');
+        const repLevelText = document.getElementById('repLevelText');
+
+        // ===== STAV =====
+        let currentTaps = 100;
+        const maxTaps = 100;
+        let currentBattery = 100;
+        const maxBattery = 100;
+        let currentHashrate = 1;
+        let currentBalance = 0;
+        const SATOSHI = 0.00000001;
+        let currentLevel = 1;
+        let currentXP = 0;
+        let requiredXP = 100;
+        let totalTapsCount = 0;
+        let playedSeconds = 0;
+        let ownedMiners = 5;
+            const boxes = {
+            1: [null, null, null],
+            2: [null, null, null],
+            3: [null, null, null],
+            4: [null, null, null]
+        };
+
+        // ===== UKLADANIE STAVU =====
+        const GAME_STORAGE_KEY = 'cm_game_state_v1';
+
+        function saveGameState() {
+            const state = {
+                currentTaps,
+                currentBattery,
+                currentHashrate,
+                currentBalance,
+                currentLevel,
+                currentXP,
+                requiredXP,
+                totalTapsCount,
+                playedSeconds,
+                ownedMiners,
+                boxes
+            };
+            try {
+                localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.warn('Nepodarilo sa uložiť stav', e);
+            }
+        }
+
+        function loadGameState() {
+            try {
+                const raw = localStorage.getItem(GAME_STORAGE_KEY);
+                if (!raw) return false;
+
+                const state = JSON.parse(raw);
+
+                currentTaps     = state.currentTaps     ?? 100;
+                currentBattery  = state.currentBattery  ?? 100;
+                currentHashrate = state.currentHashrate ?? 1;
+                currentBalance  = state.currentBalance  ?? 0;
+                currentLevel    = state.currentLevel    ?? 1;
+                currentXP       = state.currentXP       ?? 0;
+                requiredXP      = state.requiredXP      ?? 100;
+                totalTapsCount  = state.totalTapsCount  ?? 0;
+                playedSeconds   = state.playedSeconds   ?? 0;
+                ownedMiners     = state.ownedMiners     ?? 5;
+
+                if (state.boxes) {
+                    for (let b = 1; b <= 4; b++) {
+                        if (state.boxes[b]) boxes[b] = state.boxes[b];
+                    }
+                }
+                return true;
+            } catch (e) {
+                console.warn('Nepodarilo sa načítať stav', e);
+                return false;
+            }
+        }
+
+        // ===== SHOP =====
+        let currentShopTab = 'miner';
+
+        function openShop() {
+            const existing = document.getElementById('shopModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'shopModal';
+            modal.innerHTML = `
+                <div class="shop-overlay" onclick="closeShop()"></div>
+                <div class="shop-window">
+                    <div class="shop-header">
+                        <span>🛒 SHOP</span>
+                        <button class="close-btn" onclick="closeShop()">✕</button>
+                    </div>
+
+                    <div class="shop-tabs">
+                        <div class="shop-tab active" id="tab-miner" onclick="switchShopTab('miner')">MINER</div>
+                        <div class="shop-tab" id="tab-part" onclick="switchShopTab('part')">PART</div>
+                        <div class="shop-tab" id="tab-power" onclick="switchShopTab('power')">POWER</div>
+                        <div class="shop-tab" id="tab-special" onclick="switchShopTab('special')">SPECIAL</div>
+                    </div>
+
+                    <div class="shop-content" id="shopContent">
+                        <!-- obsah sa mení -->
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // predvolená záložka
+            switchShopTab('miner');
+        }
+
+        function closeShop() {
+            const modal = document.getElementById('shopModal');
+            if (modal) modal.remove();
+        }
+
+        function switchShopTab(tab) {
+            currentShopTab = tab;
+
+            // označ aktívnu záložku
+            document.querySelectorAll('.shop-tab').forEach(el => el.classList.remove('active'));
+            const activeTab = document.getElementById('tab-' + tab);
+            if (activeTab) activeTab.classList.add('active');
+
+            // obsah podľa kategórie
+            const content = document.getElementById('shopContent');
+            if (!content) return;
+
+            let html = '';
+
+            if (tab === 'miner') {
+                html = `
+                    <div class="shop-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">⛏ MINERS</div>
+                        Tu budú mineri na predaj<br>
+                        (Basic, Advanced, Epic...)
+                    </div>
+                `;
+            }
+            else if (tab === 'part') {
+                html = `
+                    <div class="shop-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">🔧 PARTS</div>
+                        Tu budú diely a komponenty<br>
+                        (Fans, Boards, Coolers...)
+                    </div>
+                `;
+            }
+            else if (tab === 'power') {
+                html = `
+                    <div class="shop-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">⚡ POWER</div>
+                        Tu budú power-upy<br>
+                        (Battery, Boost, Energy...)
+                    </div>
+                `;
+            }
+            else if (tab === 'special') {
+                html = `
+                    <div class="shop-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">✨ SPECIAL</div>
+                        Tu budú špeciálne položky<br>
+                        (Limited, NFT, Exclusive...)
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+        }
+
+        // ===== DAILY BONUS + DAILY LOGIN =====
+
+        // Odmeny: deň N = N satoshi CRM
+        const DAILY_LOGIN_REWARDS = Array.from({ length: 15 }, (_, i) => ({
+            day: i + 1,
+            type: 'crm',
+            value: i + 1,           // 1, 2, 3 ... 15 satoshi
+            label: (i + 1) + ' sat'
+        }));
+
+        const LOGIN_STORAGE_KEY = 'cm_daily_login_v1';
+        const MS_24H = 24 * 60 * 60 * 1000;
+
+        function loadLoginState() {
+            try {
+                const raw = localStorage.getItem(LOGIN_STORAGE_KEY);
+                if (!raw) {
+                    return {
+                        claimedDays: [],      // [1, 2, ...]
+                        lastClaimTime: null,  // timestamp ms
+                        currentDay: 1         // 1–15
+                    };
+                }
+                return JSON.parse(raw);
+            } catch (e) {
+                return { claimedDays: [], lastClaimTime: null, currentDay: 1 };
+            }
+        }
+
+        function saveLoginState(state) {
+            localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(state));
+        }
+
+        /** Ak ubehlo viac ako 48 h od posledného claim → reset na deň 1 (prešvihol si okno) */
+        function normalizeLoginState(state) {
+            if (state.lastClaimTime != null) {
+                const elapsed = Date.now() - state.lastClaimTime;
+                if (elapsed > 2 * MS_24H) {          // 48 hodín
+                    state.claimedDays = [];
+                    state.currentDay = 1;
+                    state.lastClaimTime = null;
+                    saveLoginState(state);
+                }
+            }
+            return state;
+        }
+
+        function canClaimToday(state) {
+            if (state.lastClaimTime == null) return true;
+            return (Date.now() - state.lastClaimTime) >= MS_24H;
+        }
+
+        function openDailyBonus() {
+            const existing = document.getElementById('dailyModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'dailyModal';
+            modal.innerHTML = `
+                <div class="daily-overlay" onclick="closeDailyBonus()" title="daily-overlay"></div>
+                <div class="daily-window" title="daily-window">
+                    <div class="daily-header" title="daily-header">
+                        <span>⚛ DAILY BONUS</span>
+                        <button class="close-btn" onclick="closeDailyBonus()" title="close-btn">✕</button>
+                    </div>
+                    <div class="daily-body" title="daily-body">
+                        <button class="daily-btn" onclick="dailyAction(1)" title="daily-btn">
+                            <img src="dailylogin.png" alt="DAILY Login">
+                        </button>
+                        <button class="daily-btn" onclick="dailyAction(2)" title="daily-btn">
+                            <img src="reklama.png" alt="WATCH AD">
+                        </button>
+                        <button class="daily-btn" onclick="dailyAction(3)" title="daily-btn">
+                            <img src="luckyspin.png" alt="LUCKY SPIN">
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function dailyAction(num) {
+        if (num === 1) {
+            closeDailyBonus();          // ← zatvorí Daily Bonus
+            openDailyLogin();           // ← potom otvorí Daily Login
+            return;
+        }
+        showToast('Klikol si na BONUS ' + num);
+        }
+
+        function closeDailyBonus() {
+            const modal = document.getElementById('dailyModal');
+            if (modal) modal.remove();
+        }
+
+        function openDailyLogin() {
+            const existing = document.getElementById('loginModal');
+            if (existing) existing.remove();
+
+            let state = normalizeLoginState(loadLoginState());
+            const claimOk = canClaimToday(state);
+
+            // dostupný je len currentDay, a len ak už ubehlo 24h (alebo ešte nikdy neclaimol)
+            let availableDay = null;
+            if (claimOk && state.currentDay >= 1 && state.currentDay <= 15) {
+                availableDay = state.currentDay;
+            }
+
+            let gridHTML = '';
+            for (let i = 0; i < 15; i++) {
+                const day = i + 1;
+                const reward = DAILY_LOGIN_REWARDS[i];
+                const isClaimed = state.claimedDays.includes(day);
+                const isAvailable = day === availableDay;
+
+            let cls = 'login-day';
+            if (isAvailable) cls += ' available';
+            else if (isClaimed) cls += ' claimed';
+
+                const clickAttr = isAvailable ? `onclick="claimDailyLoginDay(${day})"` : '';
+
+            gridHTML += `
+                <div class="${cls}" ${clickAttr} title="Deň ${day}">
+                    <div class="day-num">D${day}</div>
+                    <div class="day-reward">${reward.label}</div>
+                </div>
+            `;
+            }
+
+                const claimedCount = state.claimedDays.length;
+            let statusText = `Vyzdvihnuté: ${claimedCount}/15 · Ďalší: Deň ${state.currentDay}`;
+            if (!claimOk) {
+                const left = MS_24H - (Date.now() - state.lastClaimTime);
+                const h = Math.floor(left / 3600000);
+                const m = Math.floor((left % 3600000) / 60000);
+                statusText = `Dnes už vyzdvihnuté ✓ · Ďalší o ${h}h ${m}m`;
+            }
+
+                const modal = document.createElement('div');
+            modal.id = 'loginModal';
+            modal.innerHTML = `
+                <div class="login-overlay" onclick="closeDailyLogin()" title="login-overlay"></div>
+                <div class="login-window" title="login-window">
+                    <div class="login-header" title="login-header">
+                        <span>⚛ DAILY LOGIN</span>
+                        <button class="close-btn" onclick="closeDailyLogin()" title="close-btn">✕</button>
+                    </div>
+                    <div class="login-body" title="login-body">
+                        <div class="login-info" title="login-info">
+                            Klikni na <b>zelené políčko</b> a získaj bonus.<br>
+                            Ak neprídeš do 24 hodín, séria sa reštartuje od dňa 1.
+                        </div>
+                        <div class="login-streak" title="login-streak">${statusText}</div>
+                        <div class="login-grid" title="login-grid">${gridHTML}</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closeDailyLogin() {
+            const modal = document.getElementById('loginModal');
+            if (modal) modal.remove();
+        }
+
+        function claimDailyLoginDay(day) {
+        let state = normalizeLoginState(loadLoginState());
+
+        if (!canClaimToday(state)) {
+            showToast('Bonus môžeš vyzdvihnúť raz za 24 hodín!');
+            return;
+        }
+        if (day !== state.currentDay) {
+            showToast('Tento deň ešte nie je na rade!');
+            return;
+        }
+        if (state.claimedDays.includes(day) && day < 15) {
+            showToast('Tento deň už bol vyzdvihnutý!');
+            return;
+        }
+
+        const reward = DAILY_LOGIN_REWARDS[day - 1];
+        if (!reward) return;
+
+        // 1) CRM satoshi
+        currentBalance += reward.value * SATOSHI;
+        updateBalance();
+
+        // 2) Batéria na 100 %
+        currentBattery = maxBattery;
+        updateBattery();
+
+        // floating text
+        if (typeof createFloatingNumber === 'function') {
+            createFloatingNumber('+' + reward.label + ' +🔋100%');
+        }
+
+        // stav
+        if (!state.claimedDays.includes(day)) {
+            state.claimedDays.push(day);
+        }
+        state.lastClaimTime = Date.now();
+
+        if (day >= 15) {
+            // po 15. dni ostáva stále na dni 15
+            state.currentDay = 15;
+            showToast('🎉 Deň 15: +' + reward.label + ' · Batéria 100% · Ďalší deň znova 15');
+        } else {
+            state.currentDay = day + 1;
+            showToast('Daily Login Deň ' + day + ': +' + reward.label + ' · Batéria 100%');
+        }
+
+        saveLoginState(state);
+        saveGameState();
+        openDailyLogin(); // refresh mriežky
+    }
+
+        // ===== UPDATE FUNKCIE =====
+        function updateBalance() {
+            const el = document.getElementById('balanceValue');
+            if (el) el.textContent = currentBalance.toFixed(8).replace('.', ',') + ' ';
+        }
+
+        function updateCrmMining() {
+            const rate = currentHashrate * 0.00000001;
+            const el = document.getElementById('crmMiningValue');
+            if (el) el.textContent = rate.toFixed(8) + ' CRM/h';
+        }
+
+        function updateHashrateDisplay() {
+            let displayHash = currentBattery <= 0 ? currentHashrate * 0.5 : currentHashrate;
+
+            if (currentBattery <= 0) {
+                hashrateValue.classList.add('hashrate-low');
+            } else {
+                hashrateValue.classList.remove('hashrate-low');
+            }
+
+            let value, unit;
+            if (displayHash >= 1_000_000_000) {
+                value = displayHash / 1_000_000_000; unit = 'EH/s';
+            } else if (displayHash >= 1_000_000) {
+                value = displayHash / 1_000_000; unit = 'PH/s';
+            } else if (displayHash >= 1_000) {
+                value = displayHash / 1_000; unit = 'TH/s';
+            } else {
+                value = displayHash; unit = 'GH/s';
+            }
+
+            const formatted = value.toFixed(1) + ' ' + unit;
+            hashrateValue.textContent = formatted;
+        }
+
+        function updateBattery() {
+            batteryFill.style.width = currentBattery + '%';
+            batteryValue.textContent = `${currentBattery}/${maxBattery}`;
+            updateHashrateDisplay();
+            updateLiveStats();
+        }
+
+        function updateTapsDisplay() {
+            tapsValueEl.textContent = `${currentTaps}/${maxTaps}`;
+            tapCircle.classList.toggle('disabled', currentTaps <= 0);
+        }
+
+        function updateReputation() {
+            const percent = Math.min(100, (currentXP / requiredXP) * 100);
+            repFill.style.width = percent + '%';
+            repValue.textContent = Math.floor(percent) + '%';
+            repLevelText.textContent = `Lv. ${currentLevel}`;
+
+            const reactorLevel = document.getElementById('reactorLevel');
+            if (reactorLevel) reactorLevel.textContent = `Level-${currentLevel}`;
+        }
+
+        function updateLiveStats() {
+            // Total Power
+            const totalPowerEl = document.getElementById('totalPower');
+            if (totalPowerEl) totalPowerEl.textContent = currentHashrate.toFixed(1) + ' GH/s';
+
+            // Miners Owned
+            const minersOwnedEl = document.getElementById('minersOwned');
+            if (minersOwnedEl) minersOwnedEl.textContent = ownedMiners;
+
+            // Total Taps
+            const totalTapsEl = document.getElementById('totalTaps');
+            if (totalTapsEl) totalTapsEl.textContent = totalTapsCount;
+
+            // Reactor Power
+            const reactorPowerEl = document.getElementById('reactorPower');
+            if (reactorPowerEl) reactorPowerEl.textContent = currentHashrate.toFixed(1) + ' GH/s';
+
+            // Active Miners
+            let active = 0;
+            for (let b = 1; b <= 4; b++) {
+                for (let s = 0; s < 3; s++) {
+                    if (boxes[b][s] !== null) active++;
+                }
+            }
+            const activeMinersEl = document.getElementById('activeMiners');
+            if (activeMinersEl) activeMinersEl.textContent = `${active} / 12`;
+
+            const topActive = document.getElementById('topActiveMiners');
+            if (topActive) topActive.textContent = `${active} / 12`;
+        }
+
+        // ===== BOX SYSTÉM =====
+        function openBox(boxId) {
+            const existing = document.getElementById('boxModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'boxModal';
+
+            let slotsHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const hasMiner = boxes[boxId][i] !== null;
+                slotsHTML += `
+                    <div class="miner-slot ${hasMiner ? 'occupied' : ''}" onclick="toggleMiner(${boxId}, ${i})" title="Slot ${i + 1}">
+                        <div class="slot-icon">${hasMiner ? '⛏' : '+'}</div>
+                        <div class="slot-label">${hasMiner ? 'Miner' : 'Prázdne'}</div>
+                    </div>
+                `;
+            }
+
+            modal.innerHTML = `
+                <div class="box-overlay" onclick="closeBox()" title="box-overlay"></div>
+                <div class="box-window" title="box-window">
+                    <div class="box-header" title="box-header">
+                        <span>⚛ SET-UP MINERS</span>
+                        <button class="close-btn" onclick="closeBox()" title="close-btn">✕</button>
+                    </div>
+                    <div class="box-body" title="box-body">
+                        <div class="slots-title">Set Up miners for more power mining (3/3)</div>
+                        <div class="slots-container">${slotsHTML}</div>
+                        <div class="box-info" title="box-info">
+                            <b>Miners for Use: <strong style="color:#00ff88">${ownedMiners}</strong></b><br>
+                            Click to " + " to select your miner
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closeBox() {
+            const modal = document.getElementById('boxModal');
+            if (modal) modal.remove();
+        }
+
+        function toggleMiner(boxId, slotIndex) {
+            const isOccupied = boxes[boxId][slotIndex] !== null;
+
+            if (isOccupied) {
+                boxes[boxId][slotIndex] = null;
+                ownedMiners++;
+            } else {
+                if (ownedMiners <= 0) {
+                    alert('Nemáš žiadnych voľných minerov!');
+                    return;
+                }
+                boxes[boxId][slotIndex] = 'basic';
+                ownedMiners--;
+            }
+
+            updateBoxVisuals(boxId);
+            updateLiveStats();
+            openBox(boxId);
+            saveGameState();          // ← tento riadok pridaj
+        }
+
+        function updateBoxVisuals(boxId) {
+            for (let i = 0; i < 3; i++) {
+                const fan = document.getElementById(`box${boxId}-slot${i + 1}`);
+                if (!fan) continue;
+                if (boxes[boxId][i] !== null) {
+                    fan.classList.add('active');
+                } else {
+                    fan.classList.remove('active');
+                }
+            }
+        }
+
+        function initBoxVisuals() {
+            for (let b = 1; b <= 4; b++) updateBoxVisuals(b);
+        }
+
+        // ===== REACTOR (nový) =====
+        let currentReactorTab = 'upgrade';
+
+        function openReactor() {
+            const existing = document.getElementById('reactorModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'reactorModal';
+            modal.innerHTML = `
+                <div class="reactor-overlay" onclick="closeReactor()"></div>
+                <div class="reactor-window">
+                    <div class="reactor-header">
+                        <span>⚛ HLAVNÝ REACTOR</span>
+                        <button class="close-btn" onclick="closeReactor()">✕</button>
+                    </div>
+
+                    <div class="reactor-tabs">
+                        <div class="reactor-tab active" id="rtab-upgrade" onclick="switchReactorTab('upgrade')">UPGRADE</div>
+                        <div class="reactor-tab" id="rtab-shield" onclick="switchReactorTab('shield')">SHIELD</div>
+                        <div class="reactor-tab" id="rtab-energy" onclick="switchReactorTab('energy')">ENERGY</div>
+                        <div class="reactor-tab" id="rtab-boost" onclick="switchReactorTab('boost')">BOOST</div>
+                    </div>
+
+                    <div class="reactor-content" id="reactorContent">
+                        <!-- obsah sa mení -->
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // predvolená záložka
+            switchReactorTab('upgrade');
+        }
+
+        function closeReactor() {
+            const modal = document.getElementById('reactorModal');
+            if (modal) modal.remove();
+        }
+
+        function switchReactorTab(tab) {
+            currentReactorTab = tab;
+
+            // označ aktívnu záložku
+            document.querySelectorAll('.reactor-tab').forEach(el => el.classList.remove('active'));
+            const activeTab = document.getElementById('rtab-' + tab);
+            if (activeTab) activeTab.classList.add('active');
+
+            // obsah podľa kategórie
+            const content = document.getElementById('reactorContent');
+            if (!content) return;
+
+            let html = '';
+
+            if (tab === 'upgrade') {
+                html = `
+                    <div class="reactor-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">⬆ UPGRADE</div>
+                        Tu budeš vylepšovať reactor<br>
+                        (Level, výkon, kapacita...)
+                    </div>
+                `;
+            }
+            else if (tab === 'shield') {
+                html = `
+                    <div class="reactor-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">🛡️ SHIELD</div>
+                        Tu bude ochrana reactora<br>
+                        (Štíty, obrana, stabilita...)
+                    </div>
+                `;
+            }
+            else if (tab === 'energy') {
+                html = `
+                    <div class="reactor-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">⚡ ENERGY</div>
+                        Tu budeš manažovať energiu<br>
+                        (Battery, nabíjanie, spotreba...)
+                    </div>
+                `;
+            }
+            else if (tab === 'boost') {
+                html = `
+                    <div class="reactor-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">🚀 BOOST</div>
+                        Tu budú dočasné boosty reactora<br>
+                        (Overclock, turbo, multipliers...)
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+        }
+
+        function createFloatingNumber(text) {
+            const container = document.querySelector('.tap-area');
+            const floater = document.createElement('div');
+            floater.className = 'floating-number';
+            floater.textContent = text;
+            floater.style.left = `calc(50% + ${(Math.random() - 0.5) * 80}px)`;
+            floater.style.top = '10px';
+            floater.style.transform = 'translateX(-50%)';
+            container.appendChild(floater);
+            setTimeout(() => floater.remove(), 1200);
+        }
+
+        // ===== TAP =====
+        tapCircle.addEventListener('click', () => {
+            if (currentTaps <= 0) return;
+
+            currentTaps--;
+            totalTapsCount++;
+            updateTapsDisplay();
+
+            // Odmena za každých 250 tapov → batéria na 100 %
+            if (totalTapsCount > 0 && totalTapsCount % 250 === 0) {
+                currentBattery = maxBattery;
+                updateBattery();
+                createFloatingNumber('+🔋 100% (250 taps)');
+                showToast('Odmena: Batéria naplnená na 100 % za 250 tapov!');
+            }
+
+            const rewards = [
+                { type: 'gh',  value: 0.015, weight: 10, text: '+0.015 GH/s' },
+                { type: 'gh',  value: 0.02,  weight: 6,  text: '+0.02 GH/s' },
+                { type: 'gh',  value: 0.04,  weight: 3,  text: '+0.04 GH/s' },
+                { type: 'crm', value: 0.1,   weight: 80, text: '+0.1 Sat CRM' },
+                { type: 'crm', value: 0.2,   weight: 40, text: '+0.2 Sat CRM' },
+                { type: 'crm', value: 0.3,   weight: 20, text: '+0.3 Sat CRM' }
+            ];
+
+            const totalWeight = rewards.reduce((sum, r) => sum + r.weight, 0);
+            let random = Math.random() * totalWeight;
+            let selected = rewards[0];
+
+            for (const reward of rewards) {
+                if (random < reward.weight) {
+                    selected = reward;
+                    break;
+                }
+                random -= reward.weight;
+            }
+
+            if (selected.type === 'gh') {
+                currentHashrate += selected.value;
+                updateHashrateDisplay();
+                updateCrmMining();
+            } else {
+                currentBalance += selected.value * SATOSHI;
+            updateBalance();
+            }
+
+            createFloatingNumber(selected.text);
+
+            // Reputation
+            currentXP++;
+            if (currentXP >= requiredXP) {
+                currentXP = 0;
+                currentLevel++;
+                requiredXP = Math.floor(requiredXP * 3.5);
+                repLevelText.style.color = '#00ff88';
+                setTimeout(() => repLevelText.style.color = '#ffaa00', 600);
+            }
+            updateReputation();
+            updateLiveStats();
+            saveGameState();          // ← tento riadok pridaj
+            });
+
+        // ===== INTERVALY =====
+        // Regenerácia 1 tapu každých 15s
+        setInterval(() => {
+            if (currentTaps < maxTaps) {
+                currentTaps++;
+            updateTapsDisplay();
+            }
+        }, 15000);
+
+        // Battery -1 každých 120s
+        setInterval(() => {
+            if (currentBattery > 0) {
+                currentBattery--;
+            updateBattery();
+            }
+        }, 120000);
+
+        // Pasívna ťažba každú hodinu (reálny príjem)
+        setInterval(() => {
+            currentBalance += currentHashrate * 0.00000001;
+            updateBalance();
+        }, 60 * 60 * 1000);
+
+        // Played Time
+        setInterval(() => {
+            playedSeconds++;
+            const h = String(Math.floor(playedSeconds / 3600)).padStart(2, '0');
+            const m = String(Math.floor((playedSeconds % 3600) / 60)).padStart(2, '0');
+            const s = String(playedSeconds % 60).padStart(2, '0');
+            const el = document.getElementById('playedTime');
+            if (el) el.textContent = `${h}:${m}:${s}`;
+        }, 1000);
+
+        function scaleGame() {
+        const container = document.querySelector('.container');
+        if (!container) return;
+
+        // dizajnová veľkosť (musí sedieť s CSS vyššie)
+        const designWidth = 390;
+        const designHeight = 844;
+
+        const windowW = window.innerWidth;
+        const windowH = window.innerHeight;
+
+        // scale podľa menšieho pomeru → vždy sa zmestí do okna
+        const scale = Math.min(windowW / designWidth, windowH / designHeight);
+
+        container.style.transform = `scale(${scale})`;
+        }
+
+        // pri načítaní
+        scaleGame();
+
+        // pri zmene veľkosti okna / otočení telefónu
+        window.addEventListener('resize', scaleGame);
+
+        // Telegram Mini App – keď sa zmení viewport
+        if (window.Telegram?.WebApp) {
+            Telegram.WebApp.onEvent('viewportChanged', scaleGame);
+        }
+        
+        // ===== INICIALIZÁCIA =====
+        loadGameState();
+        initBoxVisuals();
+        updateTapsDisplay();
+        updateBattery();
+        updateReputation();
+        updateHashrateDisplay();
+        updateCrmMining();
+        updateBalance();
+        updateLiveStats();
+        scaleGame();
+
+        // ===== PROFILE MODAL =====
+        function openProfile() {
+            const existing = document.getElementById('profileModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'profileModal';
+            modal.innerHTML = `
+                <div class="profile-overlay" onclick="closeProfile()" title="profile-overlay"></div>
+                <div class="profile-window" title="profile-window">
+                    <div class="profile-header" title="profile-header">
+                        <span>⚛ PROFILE</span>
+                        <button class="close-btn" onclick="closeProfile()" title="close-btn">✕</button>
+                    </div>
+                    <div class="profile-body" title="profile-body">
+                        <button class="profile-btn" onclick="openChangeAvatar()" title="profile-btn">
+                            <span class="icon">🖼️</span> Change Avatar
+                        </button>
+                        <button class="profile-btn" onclick="openProfileInfo()" title="profile-btn">
+                            <span class="icon">👤</span> Profile
+                        </button>
+                        <button class="profile-btn" onclick="connectWallet()" title="profile-btn">
+                            <span class="icon">🔗</span> Connect Wallet
+                        </button>
+                        <button class="profile-btn" onclick="openSettings()" title="profile-btn">
+                            <span class="icon">⚙️</span> Settings
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closeProfile() {
+            const modal = document.getElementById('profileModal');
+            if (modal) modal.remove();
+        }
+
+        // 1. Change Avatar – zatiaľ prázdne okno
+        function openChangeAvatar() {
+            openEmptyWindow('Change Avatar', 'Tu neskôr pridáme výber avatarov');
+        }
+
+        // 2. Profile – zatiaľ prázdne okno
+        function openProfileInfo() {
+            openEmptyWindow('Profile', 'Tu neskôr pridáme detaily profilu');
+        }
+
+        // 4. Settings – zatiaľ prázdne okno
+        function openSettings() {
+            openEmptyWindow('Settings', 'Tu neskôr pridáme nastavenia');
+        }
+
+        // Univerzálne prázdne okno
+        function openEmptyWindow(title, text) {
+            const existing = document.getElementById('emptyModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'emptyModal';
+            modal.innerHTML = `
+                <div class="profile-overlay" onclick="closeEmptyWindow()" title="profile-overlay"></div>
+                <div class="empty-window" title="empty-window">
+                    <div class="empty-header" title="empty-header">
+                        <span>${title}</span>
+                        <button class="close-btn" onclick="closeEmptyWindow()" title="close-btn">✕</button>
+                    </div>
+                    <div class="empty-body">${text}</div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closeEmptyWindow() {
+            const modal = document.getElementById('emptyModal');
+            if (modal) modal.remove();
+        }
+
+        // 3. Connect Wallet – zatiaľ jednoduchá verzia (pripravíme plný TON Connect)
+        async function connectWallet() {
+            closeProfile();
+
+            if (!tonConnectUI) {
+                initTonConnect();
+            }
+
+            try {
+                if (walletAddress) {
+                    // Už je pripojená → ponúkneme disconnect
+                    const confirmed = confirm('Wallet je už pripojená.\n\nChceš ju odpojiť?');
+                    if (confirmed) {
+                        await tonConnectUI.disconnect();
+                        showToast('Wallet odpojená');
+                    }
+                } else {
+                    // Pripojiť
+                    await tonConnectUI.openModal();
+                }
+            } catch (error) {
+                console.error('TON Connect error:', error);
+                showToast('Chyba pri pripájaní walletu');
+            }
+        }
+        function updateWalletUI() {
+            // Tu môžeš neskôr meniť text tlačidla v profile
+            // Napríklad z "Connect Wallet" na skrátenú adresu
+            const shortAddr = walletAddress 
+                ? walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4)
+                : null;
+
+            // Príklad: môžeš si to neskôr napojiť na nejaký element
+            console.log('Current wallet:', shortAddr || 'Not connected');
+        }
+
+        function showToast(msg) {
+            alert(msg);
+        }
+
+        function claimBonus() {
+            showToast("Daily Bonus vyzdvihnutý!");
+        }
+
+        // Automatické ukladanie pri zatvorení / prechode do pozadia
+        window.addEventListener('beforeunload', saveGameState);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                saveGameState();
+            }
+        });
+        if (window.Telegram?.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+        }
+
+        // ===== STORAGE =====
+        let currentStorageTab = 'miners';
+
+        function openStorage() {
+            const existing = document.getElementById('storageModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'storageModal';
+            modal.innerHTML = `
+                <div class="storage-overlay" onclick="closeStorage()"></div>
+                <div class="storage-window">
+                    <div class="storage-header">
+                        <span>📦 STORAGE</span>
+                        <button class="close-btn" onclick="closeStorage()">✕</button>
+                    </div>
+
+                    <div class="storage-tabs">
+                        <div class="storage-tab active" id="stab-miners" onclick="switchStorageTab('miners')">MINERS</div>
+                        <div class="storage-tab" id="stab-parts" onclick="switchStorageTab('parts')">PARTS</div>
+                        <div class="storage-tab" id="stab-power" onclick="switchStorageTab('power')">POWER CELL</div>
+                        <div class="storage-tab" id="stab-boost" onclick="switchStorageTab('boost')">BOOST</div>
+                    </div>
+
+                    <div class="storage-content" id="storageContent">
+                        <!-- obsah sa mení -->
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // predvolená záložka
+            switchStorageTab('miners');
+        }
+
+        function closeStorage() {
+            const modal = document.getElementById('storageModal');
+            if (modal) modal.remove();
+        }
+
+        function switchStorageTab(tab) {
+            currentStorageTab = tab;
+
+            // označ aktívnu záložku
+            document.querySelectorAll('.storage-tab').forEach(el => el.classList.remove('active'));
+            const activeTab = document.getElementById('stab-' + tab);
+            if (activeTab) activeTab.classList.add('active');
+
+            // obsah podľa kategórie
+            const content = document.getElementById('storageContent');
+            if (!content) return;
+
+            let html = '';
+
+            if (tab === 'miners') {
+                html = `
+                    <div class="storage-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">⛏ MINERS</div>
+                        Tu budú tvoje vlastnené mineri<br>
+                        (Basic, Advanced, Epic...)
+                    </div>
+                `;
+            }
+            else if (tab === 'parts') {
+                html = `
+                    <div class="storage-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">🔧 PARTS</div>
+                        Tu budú tvoje diely a komponenty<br>
+                        (Fans, Boards, Coolers...)
+                    </div>
+                `;
+            }
+            else if (tab === 'power') {
+                html = `
+                    <div class="storage-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">🔋 POWER CELL</div>
+                        Tu budú tvoje power cell-y<br>
+                        (Battery packs, Energy cells...)
+                    </div>
+                `;
+            }
+            else if (tab === 'boost') {
+                html = `
+                    <div class="storage-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">🚀 BOOST</div>
+                        Tu budú tvoje boosty<br>
+                        (Speed, Hashrate, Multipliers...)
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+        }
+
+        // ===== LEADERBOARD =====
+        let currentLeaderboardTab = 'level';
+
+        function openLeaderboard() {
+            const existing = document.getElementById('leaderboardModal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'leaderboardModal';
+            modal.innerHTML = `
+                <div class="leaderboard-overlay" onclick="closeLeaderboard()"></div>
+                <div class="leaderboard-window">
+                    <div class="leaderboard-header">
+                        <span>🏆 LEADERBOARD</span>
+                        <button class="close-btn" onclick="closeLeaderboard()">✕</button>
+                    </div>
+
+                    <div class="leaderboard-tabs">
+                        <div class="leaderboard-tab active" id="ltab-level" onclick="switchLeaderboardTab('level')">LEVEL</div>
+                        <div class="leaderboard-tab" id="ltab-taps" onclick="switchLeaderboardTab('taps')">TAPS</div>
+                        <div class="leaderboard-tab" id="ltab-power" onclick="switchLeaderboardTab('power')">POWER</div>
+                        <div class="leaderboard-tab" id="ltab-played" onclick="switchLeaderboardTab('played')">PLAYED</div>
+                        <div class="leaderboard-tab" id="ltab-rank" onclick="switchLeaderboardTab('rank')">RANK</div>
+                    </div>
+
+                    <div class="leaderboard-content" id="leaderboardContent">
+                        <!-- obsah sa mení -->
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // predvolená záložka
+            switchLeaderboardTab('level');
+        }
+
+        function closeLeaderboard() {
+            const modal = document.getElementById('leaderboardModal');
+            if (modal) modal.remove();
+        }
+
+        function switchLeaderboardTab(tab) {
+            currentLeaderboardTab = tab;
+
+            // označ aktívnu záložku
+            document.querySelectorAll('.leaderboard-tab').forEach(el => el.classList.remove('active'));
+            const activeTab = document.getElementById('ltab-' + tab);
+            if (activeTab) activeTab.classList.add('active');
+
+            // obsah podľa kategórie
+            const content = document.getElementById('leaderboardContent');
+            if (!content) return;
+
+            let html = '';
+
+            if (tab === 'level') {
+                html = `
+                    <div class="leaderboard-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">⭐ LEVEL</div>
+                        Rebríček hráčov podľa Levelu<br>
+                        (Top 100 podľa levelu)
+                    </div>
+                `;
+            }
+            else if (tab === 'taps') {
+                html = `
+                    <div class="leaderboard-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">👆 TAPS</div>
+                        Rebríček hráčov podľa celkového počtu tapov<br>
+                        (Top 100 podľa taps)
+                    </div>
+                `;
+            }
+            else if (tab === 'power') {
+                html = `
+                    <div class="leaderboard-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">⚡ POWER</div>
+                        Rebríček hráčov podľa Hashrate / Power<br>
+                        (Top 100 podľa výkonu)
+                    </div>
+                `;
+            }
+            else if (tab === 'played') {
+                html = `
+                    <div class="leaderboard-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">⏱️ PLAYED</div>
+                        Rebríček hráčov podľa odohraného času<br>
+                        (Top 100 podľa played time)
+                    </div>
+                `;
+            }
+            else if (tab === 'rank') {
+                html = `
+                    <div class="leaderboard-placeholder">
+                        <div style="font-size:18px; color:#00f0ff; margin-bottom:12px;">🏅 RANK</div>
+                        Celkové poradie hráčov<br>
+                        (Kombinované skóre)
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+        }
+
+    </script>
+    <!-- TON Connect UI -->
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.11/dist/tonconnect-ui.min.js"></script>
+</body>
+</html>
